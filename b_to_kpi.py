@@ -8,37 +8,29 @@
 # granted to it by virtue of its status as an Intergovernmental Organization  #
 # or submit itself to any jurisdiction.                                       #
 ###############################################################################
-"""Define HLT2 line for ``Lambda_b0 -> Lambda_c+ pi+``.
-
-With ``Lambda_c+ -> p+ K- pi+``.
-
-An example input file and Moore configuration is also given at the bottom of
-this file, so that it can be run as-is.
-"""
 import Functors as F
 from Functors.math import in_range
 from GaudiKernel.SystemOfUnits import MeV, mm
 
 from Moore.config import register_line_builder
 from Moore.lines import Hlt2Line
+
 from RecoConf.reconstruction_objects import (
     make_pvs_v2 as make_pvs,
     upfront_reconstruction,
 )
-# For code inside files under Hlt2Conf/python/lines you should reference these
-# two modules using relative imports:
-#
-#     from ..standard_particles import make_has_rich_long_kaons
 from Hlt2Conf.standard_particles import (
     make_has_rich_long_kaons,
     make_merged_pi0s,
     make_KsLL,
 )
+
 from Hlt2Conf.algorithms_thor import ParticleCombiner, ParticleFilter, require_all
 
 all_lines = {}
 
-def filter_kaons(particles, pvs, 
+def filter_kaons(particles, 
+                 pvs, 
                  trchi2dof_max=3.0, 
                  trghostprob_max=0.5,
                  pt_min=1200 * MeV, 
@@ -56,7 +48,8 @@ def filter_kaons(particles, pvs,
     return ParticleFilter(particles, F.FILTER(cut))
 
 
-def filter_pions(particles, pvs, 
+def filter_pions(particles, 
+                 pvs, 
                  pt_min=3500 * MeV, 
                  p_min=5000 * MeV):
     cut = require_all(
@@ -85,6 +78,7 @@ def make_bs(kaons,
     )
     return ParticleCombiner(
         [kaons, pions],
+        ParticleCombiner="ParticleAdder",
         DecayDescriptor="[B+ -> K+ pi0]cc",
         CombinationCut=combination_code,
         CompositeCut=composite_code,
