@@ -20,6 +20,14 @@
 
 #include <functional>
 
+//LoKi
+/*#include "LoKi/Child.h"
+#include "LoKi/Constants.h"
+#include "LoKi/ILoKiSvc.h"
+#include "LoKi/Interface.h"
+#include "LoKi/Particles26.h"
+#include "LoKi/GetTools.h"*/
+
 namespace Sel {
   // Forward declarations so that shorthand versions of these functions can be
   // defined in Sel::detail::ParticleCombinationBase
@@ -41,7 +49,27 @@ namespace Sel {
   template <typename... child_ts, typename transform_t, typename reduce_t>
   auto pairwise_transform_reduce( ParticleCombination<child_ts...> const& comb, transform_t transform,
                                   reduce_t reduce );
-  //so i think pairwise_transform_reduce extracts all the particles without input, transform takes ints and transforms to the corresponding particles, and transform_reduce takes no arguments and extracts a single(?) particle 
+//so i think pairwise_transform_reduce extracts all the particles without input, transform
+//takes ints and transforms to the corresponding particles, and transform_reduce takes no arg
+//uments and extracts a single(?) particle
+
+//forward declaration of child_t so i can use it for mtdocachi2
+  /** Get a reference to the Nth child.
+   *  If this is std::reference_wrapper<T>, T& is returned.
+   */
+  template <std::size_t N>
+    child_t<N>& get() {
+    return std::get<N>( m_children );
+  }
+
+  /** Get a const reference to the Nth child.
+   *  If this is std::reference_wrapper<T [const]>, T const& is returned.
+   */
+  template <std::size_t N>
+    child_t<N> const& get() const {
+    return std::get<N>( m_children );
+  }
+ 
 } // namespace Sel
 
 namespace Sel::detail {
@@ -74,20 +102,36 @@ namespace Sel::detail {
 	return transform<N, M>( [&]( auto const& pN, auto const& pM ) { return dist_calc.particleDOCAChi2( pN, pM ); } );
       }
       
-      template <std::size_t N, std::size_t M, typename DistanceCalculator>
+      template <std::size_t N, typename DistanceCalculator>
 	auto mtdocachi2( DistanceCalculator const& dist_calc ) const {
+	std::unique_ptr<LHCb::Particle> pN = child_t<N>;
 	if constexpr (Sel::Utils::is_legacy_particle<pN>) {
+	    LoKi::Particles::MTDOCA::result_type LoKi::Particles::MTDOCA::operator()(LoKi::Particles::MTDOCA::argument pMother ) const {
+	      if ( 0 == pMother ) {
+		error("Invalid particle, return 'InvalidDistance'").ignore();
+		return LoKi::Constants::InvalidDistance;
+	      }
+	      const LHCb::Particle* pChild = LoKi::Child::child( pMother, getIndex() );
+	    if ( 0 == pChild ) {
+	      Error( "Invalid child particle, return 'InvalidDistance'").ignore();
+	      return LoKi::Constants::InvalidDistance;
+	    }
+	    
 	    // clone the mother and move it to the PV
-	    std::unique_ptr<LHCb::Particle> tempMother( mother->clone() );
-	    //pN is daughter, pMother is mother
-	    const LHCb::VertexBase* aPV = bestVertex( pN );
+	    std::unique_ptr<LHCb::Particle> tempMother( pMother->clone() );
+	    //pChild is child, pMother is mother
+	    const LHCb::VertexBase* aPV = bestVertex( pChild );
 	    
 	    //Update the position errors
 	    tempMother->setReferencePoint( aPV->position() );
 	    tempMother->setPosCovMatrix( aPV->covMatrix() );
-
-	    auto tempMother = moveMother(pMother, pN);
-	    return transform<N>( [&]( auto const& pN) { return dist_calc.particleDOCAChi2( pN, pMother ); } ); 
+	    
+	    tempMother = moveMother(pMother, pN);
+	    /** Calculate the distance of closest approach chi2 between child `N` and
+	     *  child `M` of the combination.                                              
+	     */
+	    return transform<N>( [&]( auto const& pN) { return dist_calc.particleDOCAChi2( pN, tempMother ); } ); 
+	    }
 	  }
       }
       
@@ -286,18 +330,18 @@ namespace Sel {
     /** Get a reference to the Nth child.
      *  If this is std::reference_wrapper<T>, T& is returned.
      */
-    template <std::size_t N>
+    /*  template <std::size_t N>
     child_t<N>& get() {
       return std::get<N>( m_children );
-    }
+      }*/
 
     /** Get a const reference to the Nth child.
      *  If this is std::reference_wrapper<T [const]>, T const& is returned.
      */
-    template <std::size_t N>
+    /*template <std::size_t N>
     child_t<N> const& get() const {
       return std::get<N>( m_children );
-    }
+    }*/
 
     /** Unfortunately this is needed in order for the AcceptAll functor (ALL) to work.
      */
