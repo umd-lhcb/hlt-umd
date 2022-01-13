@@ -194,14 +194,12 @@ DOCACHI2 = Functor(
     AllowMultiplePositionalArguments=True)
 MTDOCACHI2 = Functor(
     'MTDOCACHI2',
-    "Combination::MotherTrajectoryDistanceOfClosestApproachChi2",
-    "Combination.h",
+    "Composite::MotherTrajectoryDistanceOfClosestApproachChi2",
+    "Composite.h",
     """Compute the significance of the distance of closest
     approach between mother and child.""",
-    Params=[('Child1',
-             'Index [starting from 1] of the first child to consider.', int),
-            ('Child2',
-             'Index [starting from 1] of the second child to consider.', int)],
+    Params=[('Child',
+             'Index [starting from 1] of the child to consider.', int)],
     TemplateParams=[('DistanceCalculator',
                      'Distance calculator implementation to use.')],
     AllowMultiplePositionalArguments=True)
