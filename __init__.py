@@ -29,9 +29,18 @@ COV = Functor(
     'Get the specified (i, j)th element of the covariance matrix.',
     Params=[('Row', 'Row to access', int), ('Col', 'Column to access', int)])
 P = Functor('P', "Track::Momentum", "TrackLike.h", "Momentum.")
+FOURMOMENTUM = Functor('FOURMOMENTUM', "Track::FourMomentum", "TrackLike.h",
+                       "Four-momentum")
+PX = Functor('PX', "Track::Px", "TrackLike.h",
+             "PX component of four-momentum.")
+PY = Functor('PY', "Track::Py", "TrackLike.h",
+             "PY component of four-momentum.")
+PZ = Functor('PZ', "Track::Pz", "TrackLike.h",
+             "PZ component of four-momentum.")
+ENERGY = Functor('ENERGY', "Track::Energy", "TrackLike.h",
+                 "Energy component of four-momentum.")
 PT = Functor('PT', "Track::TransverseMomentum", "TrackLike.h",
              "Transverse momentum.")
-MYPT = Functor ('MYPT', "Track::MyTransverseMomentum", "TrackLike.h", "My transverse Momentum.")
 PHI = Functor('PHI', "Track::Phi", "TrackLike.h", "Azimuthal angle, phi.")
 ETA = Functor('ETA', "Track::PseudoRapidity", "TrackLike.h", "Pseudorapidity.")
 ISMUON = Functor('ISMUON', "Track::IsMuon", "TrackLike.h", "IsMuon.")
@@ -52,8 +61,18 @@ CLOSESTTOBEAM = Functor(
     'Adapter to apply a functor to the closest-to-beam state of the argument.',
     Params=[('Functor', 'Functor to apply to the closest to beam state',
              BoundFunctor)])
+### Number of hits on track
 NHITS = Functor('NHITS', "Track::nHits", "TrackLike.h",
                 "Track number of hits.")
+NVPHITS = Functor('NVPHITS', "Track::nVPHits", "TrackLike.h",
+                  "number of VP hits.")
+NUTHITS = Functor('NUTHITS', "Track::nUTHits", "TrackLike.h",
+                  "number of UT hits.")
+NFTHITS = Functor('NFTHITS', "Track::nFTHits", "TrackLike.h",
+                  "number of FT hits.")
+###
+TRACKHISTORY = Functor('TRACKHISTORY', "Track::history", "TrackLike.h",
+                       "Name of the algorithm that made the track.")
 MINIP = Functor(
     'MINIP',
     "Track::MinimumImpactParameter",
@@ -330,7 +349,7 @@ BPVVDRHO = Functor(
     TemplateParams=[('VerticesType', 'Input vertex container type')])
 BPVLTIME = Functor(
     'BPVLTIME',
-    'Composite::ComputeLifetime',
+    'Composite::Lifetime',
     'Composite.h',
     '''Return the particle lifetime w.r.t. the associated vertex, assuming
     that it is from the container of vertices that is passed. If no association
@@ -462,3 +481,12 @@ POD = Functor(
     'Try to convert an object representing a scalar number into a plain C++ type. For example, convert SIMDWrapper::scalar::float_v to float.',
     Params=[('Functor', 'The functor to convert the return value of.',
              BoundFunctor)])
+
+MAP_INPUT = Functor(
+    'MAP_INPUT',
+    'Adapters::ParticleMapper',
+    'Adapters.h',
+    '''Get the mass of a refitted candidate given the location of the output
+       particles from DecayTreeFitterAlg.''',
+    Params=[('Functor', "The functor to apply to the particle.", BoundFunctor),
+            ('Relations', 'TES location of relation table', DataHandle)])
