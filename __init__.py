@@ -217,8 +217,7 @@ MTDOCACHI2 = Functor(
     "Composite.h",
     """Compute the significance of the distance of closest
     approach between mother and child.""",
-    Params=[('Child',
-             'Index [starting from 1] of the child to consider.', int)],
+    Params=[('Child', 'Index [starting from 1] of the child to consider.', int)],
     TemplateParams=[('DistanceCalculator',
                      'Distance calculator implementation to use.')],
     AllowMultiplePositionalArguments=True)

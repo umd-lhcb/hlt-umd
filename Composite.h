@@ -104,37 +104,20 @@ namespace Functors::detail {
     }
   };
 
+  template <typename DistanceCalculator, typename T, T N>
   struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
-    template <std::size_t N, typename DistanceCalculator, typename Particle>
-      auto operator()( DistanceCalculator const& dist_calc, Particle const& composite  ) const {
+    
+    static_assert (N>=1, "Indices start from 1 for LoKi compatibility.");
+    
+    template <typename Particle> 
+    auto operator()( Particle const& composite ) const {
       if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
-	  LoKi::Particles::MTDOCA::result_type LoKi::Particles::MTDOCA::operator()(LoKi::Particles::MTDOCA::argument pMother ) const {
-	    if ( 0 == pMother ) {
-	      error("Invalid particle, return 'InvalidDistance'").ignore();
-	      return LoKi::Constants::InvalidDistance;
-	    }
-	    const LHCb::Particle* pChild = LoKi::Child::child( pMother, getIndex() );
-	    if ( 0 == pChild ) {
-	      Error( "Invalid child particle, return 'InvalidDistance'").ignore();
-	      return LoKi::Constants::InvalidDistance;
-	    }
-	        
-	    // clone the mother and move it to the PV
-	    std::unique_ptr<LHCb::Particle> tempMother( pMother->clone() );
-	    //pChild is child, pMother is mother
-	    const LHCb::VertexBase* aPV = bestVertex( pChild );
-	        
-	    //Update the position errors
-	    tempMother->setReferencePoint( aPV->position() );
-	    tempMother->setPosCovMatrix( aPV->covMatrix() );
-	        
-	    tempMother = moveMother(pMother, pN);
-	    /** Calculate the distance of closest approach chi2 between child `N` and
-	     *  child `M` of the combination.                                              
-	     */
-	    return dist_calc.particleDOCAChi2( pN, tempMother ); 
-	  }
+	  //return dist_calc.particleDOCAChi2( pN, tempMother ); 
+	  return 1.0;
 	}
+      else {
+	return 1.0;
+      }
     }
   };
 
@@ -300,10 +283,16 @@ namespace Functors::Composite {
    *  be checked for compatibility with the given vertex container and, if it
    *  matches, be used.
    */
+  
   template <typename VContainer = detail::DefaultPVContainer_t>
-  auto FlightDistanceChi2ToVertex( std::string vertex_location ) {
+    auto FlightDistanceChi2ToVertex( std::string vertex_location ) {
     return detail::DataDepWrapper<Function, detail::FlightDistanceChi2ToVertex, VContainer>{
-        std::move( vertex_location )};
+      std::move( vertex_location )};
+  }
+  
+  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename T, T N>
+  auto MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<T, N> ) {
+    return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
   }
 
   /** @brief Z component of flight distance of the given composite. */
