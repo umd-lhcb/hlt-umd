@@ -104,14 +104,28 @@ namespace Functors::detail {
     }
   };
 
+  /**MTDOCACHI2**/
   template <typename DistanceCalculator, typename T, T N>
   struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
     
     static_assert (N>=1, "Indices start from 1 for LoKi compatibility.");
-    
-    template <typename Particle> 
-    auto operator()( Particle const& composite ) const {
+    MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<T, N>) {}
+
+    void bind( TopLevelInfo& top_level ){ dist_calc.emplace( top_level.algorithm() ); }
+
+    template <typename VContainer, typename Particle> 
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+	 
       if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
+	  const auto& children = composite.daughtersVector();
+	  const auto& pN = children[N];
+	  const auto& aPV = Sel::getBestPV( pN, vertices );
+	  //std::unique_ptr<LHCb::Particle> tempMother( composite->clone() );
+	  
+	  //tempMother->setReferencePoint( aPV->position() );
+	  //tempMother->setPosCovMatrix( aPV->covMatrix() );
+	  
+	  //const auto& tempMother = 
 	  //return dist_calc.particleDOCAChi2( pN, tempMother ); 
 	  return 1.0;
 	}
@@ -119,6 +133,9 @@ namespace Functors::detail {
 	return 1.0;
       }
     }
+    
+  private:
+    std::optional<DistanceCalculator> dist_calc;
   };
 
   /** BPVVDZ */
@@ -283,16 +300,15 @@ namespace Functors::Composite {
    *  be checked for compatibility with the given vertex container and, if it
    *  matches, be used.
    */
-  
   template <typename VContainer = detail::DefaultPVContainer_t>
-    auto FlightDistanceChi2ToVertex( std::string vertex_location ) {
+  auto FlightDistanceChi2ToVertex( std::string vertex_location ) {
     return detail::DataDepWrapper<Function, detail::FlightDistanceChi2ToVertex, VContainer>{
       std::move( vertex_location )};
   }
   
-  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename T, T N>
-  auto MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<T, N> ) {
-    return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
+  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename VContainer = detail::DefaultPVContainer_t, typename T, T N>
+  auto MotherTrajectoryDistanceOfClosestApproachChi2( std::string vertex_location, std::integral_constant<T, N> ) {
+    return detail::MotherTrajectoryDistanceOfClosestApproachChi2< DistanceCalculator, T, N>();//should i be putting something in the () brackets?
   }
 
   /** @brief Z component of flight distance of the given composite. */

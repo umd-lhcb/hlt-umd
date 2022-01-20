@@ -217,9 +217,11 @@ MTDOCACHI2 = Functor(
     "Composite.h",
     """Compute the significance of the distance of closest
     approach between mother and child.""",
-    Params=[('Child', 'Index [starting from 1] of the child to consider.', int)],
+    Params=[ ('Vertices', 'TES location of input [primary] vertices.', DataHandle), 
+             ('Child', 'Index [starting from 1] of the child to consider.', int)],
     TemplateParams=[('DistanceCalculator',
-                     'Distance calculator implementation to use.')],
+                     'Distance calculator implementation to use.'), 
+                    ('VerticesType', 'Input vertex container type')],
     AllowMultiplePositionalArguments=True)
 ALV = Functor(
     'ALV',
