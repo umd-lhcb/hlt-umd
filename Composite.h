@@ -290,11 +290,9 @@ namespace Functors::Composite {
       std::move( vertex_location )};
   }
 
-  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename T, T N>
+  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename VContainer = detail::DefaultPVContainer_t, typename T, T N>
     auto MotherTrajectoryDistanceOfClosestApproachChi2( std::string vertex_location, std::integral_constant<T, N> ) {
-    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2, VContainer, T>{std::move( vertex_location )};
-
-    //return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
+    return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
   }
   
 
