@@ -211,18 +211,18 @@ DOCACHI2 = Functor(
     TemplateParams=[('DistanceCalculator',
                      'Distance calculator implementation to use.')],
     AllowMultiplePositionalArguments=True)
+
 MTDOCACHI2 = Functor(
     'MTDOCACHI2',
     "Composite::MotherTrajectoryDistanceOfClosestApproachChi2",
     "Composite.h",
     """Compute the significance of the distance of closest
     approach between mother and child.""",
-    Params=[ ('Vertices', 'TES location of input [primary] vertices.', DataHandle), 
-             ('Child', 'Index [starting from 1] of the child to consider.', int)],
+    Params=[('Child', 'Index [starting from 1] of the child to consider.', int)],
     TemplateParams=[('DistanceCalculator',
-                     'Distance calculator implementation to use.'), 
-                    ('VerticesType', 'Input vertex container type')],
+                     'Distance calculator implementation to use.')], 
     AllowMultiplePositionalArguments=True)
+
 ALV = Functor(
     'ALV',
     "Combination::CosAngleBetweenDecayProducts",
@@ -337,6 +337,7 @@ BPVVDZ = Functor(
     ''',
     Params=[('Vertices', 'TES location of input [primary] vertices.',
              DataHandle)],
+            #('Child', 'Index [starting from 1] of the child to consider.', int)],
     TemplateParams=[('VerticesType', 'Input vertex container type')])
 BPVVDRHO = Functor(
     'BPVVDRHO',
@@ -356,7 +357,8 @@ BPVLTIME = Functor(
     that it is from the container of vertices that is passed. If no association
     is available, compute one.''',
     Params=[('Vertices', 'TES location of input [primary] vertices.',
-             DataHandle)],
+             DataHandle),
+        ],
     TemplateParams=[
         ('VerticesType', 'Input vertex container type'),
     ])

@@ -84,48 +84,33 @@ namespace Functors::detail {
     }
   }
 
+
   struct FlightDistanceChi2ToVertex : public Function {
     /** This allows some error messages to be customised. It is not critical. */
     static constexpr auto name() { return "FlightDistanceChi2ToVertex"; }
 
     template <typename VContainer, typename Particle>
-    auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
       // Get the associated PV -- this uses a link if it's available and
       // computes the association if it's not.
       auto const& bestPV = Sel::getBestPV( composite, vertices );
 
       // Now calculate the flight distance chi2 between 'composite' and 'bestPV'
-      if constexpr ( Sel::Utils::is_legacy_particle<Particle> ) {
-        assert( composite.endVertex() );
-        return Sel::Utils::flightDistanceChi2( *composite.endVertex(), bestPV );
-      } else {
-        return Sel::Utils::flightDistanceChi2( composite, bestPV );
-      }
+      return Sel::Utils::flightDistanceChi2( composite, bestPV );
     }
-  };
+  };  
 
   /**MTDOCACHI2**/
   template <typename DistanceCalculator, typename T, T N>
-  struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
+    struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
     
     static_assert (N>=1, "Indices start from 1 for LoKi compatibility.");
-    MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<T, N>) {}
-
-    void bind( TopLevelInfo& top_level ){ dist_calc.emplace( top_level.algorithm() ); }
-
-    template <typename VContainer, typename Particle> 
-      auto operator()( VContainer const& vertices, Particle const& composite ) const {
-	 
+    
+    template <typename Particle> 
+      auto operator()( Particle const& composite ) const {
       if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
 	  const auto& children = composite.daughtersVector();
 	  const auto& pN = children[N];
-	  const auto& aPV = Sel::getBestPV( pN, vertices );
-	  //std::unique_ptr<LHCb::Particle> tempMother( composite->clone() );
-	  
-	  //tempMother->setReferencePoint( aPV->position() );
-	  //tempMother->setPosCovMatrix( aPV->covMatrix() );
-	  
-	  //const auto& tempMother = 
 	  //return dist_calc.particleDOCAChi2( pN, tempMother ); 
 	  return 1.0;
 	}
@@ -133,14 +118,12 @@ namespace Functors::detail {
 	return 1.0;
       }
     }
-    
-  private:
-    std::optional<DistanceCalculator> dist_calc;
   };
 
   /** BPVVDZ */
   /** origin version in Loki defined in PHYS/PHYS_v25r1/Phys/LoKiPhys/src/Particles20.cpp,
   VertexZDistanceWithTheBestPV function */
+  //template <typename T, T N>
   struct DeltaZToVertex : public Function {
     /** This allows some error messages to be customised. It is not critical. */
     static constexpr auto name() { return "DeltaZToVertex"; }
@@ -151,6 +134,7 @@ namespace Functors::detail {
       // Get the position of end vertex
       using Sel::Utils::endVertexPos;
       return ( endVertexPos( composite ) - getBestPVPosition( composite, vertices ) ).Z();
+      //return 1.0;
     }
   };
 
@@ -305,16 +289,19 @@ namespace Functors::Composite {
     return detail::DataDepWrapper<Function, detail::FlightDistanceChi2ToVertex, VContainer>{
       std::move( vertex_location )};
   }
-  
-  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename VContainer = detail::DefaultPVContainer_t, typename T, T N>
-  auto MotherTrajectoryDistanceOfClosestApproachChi2( std::string vertex_location, std::integral_constant<T, N> ) {
-    return detail::MotherTrajectoryDistanceOfClosestApproachChi2< DistanceCalculator, T, N>();//should i be putting something in the () brackets?
+
+  template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename T, T N>
+  auto MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<T, N> ) {
+    return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
   }
+  
 
   /** @brief Z component of flight distance of the given composite. */
-  template <typename VContainer = detail::DefaultPVContainer_t>
+  template < typename VContainer = detail::DefaultPVContainer_t >
+  //template <
   auto DeltaZToVertex( std::string vertex_location ) {
-    return detail::DataDepWrapper<Function, detail::DeltaZToVertex, VContainer>{std::move( vertex_location )};
+    return detail::DataDepWrapper<Function, detail::DeltaZToVertex, VContainer>
+    {std::move( vertex_location )};
   }
 
   /** @brief Rho component of flight distance of the given composite. */
