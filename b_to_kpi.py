@@ -73,8 +73,8 @@ def make_bs(kaons,
         F.SUM(F.PT) > comb_pt_min,
     )
     composite_code = require_all(
-        #F.MTDOCACHI2(pvs, 1)<mtdocachi2_max,
-        F.MTDOCACHI2(1)<mtdocachi2_max,
+        F.MTDOCACHI2(pvs, 1)<mtdocachi2_max,
+        #F.MTDOCACHI2(1)<mtdocachi2_max,
         #F.BPVVDZ(pvs, 1)<mtdocachi2_max,
         #F.BPVVDZ(pvs)<mtdocachi2_max,
         F.PT > pt_min,

@@ -106,8 +106,8 @@ namespace Functors::detail {
     
     static_assert (N>=1, "Indices start from 1 for LoKi compatibility.");
     
-    template <typename Particle> 
-      auto operator()( Particle const& composite ) const {
+    template <typename VContainer, typename Particle> 
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
       if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
 	  const auto& children = composite.daughtersVector();
 	  const auto& pN = children[N];
@@ -291,8 +291,10 @@ namespace Functors::Composite {
   }
 
   template <typename DistanceCalculator = detail::DefaultDistanceCalculator_t, typename T, T N>
-  auto MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<T, N> ) {
-    return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
+    auto MotherTrajectoryDistanceOfClosestApproachChi2( std::string vertex_location, std::integral_constant<T, N> ) {
+    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2, VContainer, T>{std::move( vertex_location )};
+
+    //return detail::MotherTrajectoryDistanceOfClosestApproachChi2<DistanceCalculator, T, N>();
   }
   
 
