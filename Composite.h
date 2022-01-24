@@ -108,15 +108,17 @@ namespace Functors::detail {
     
     template <typename VContainer, typename Particle> 
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
-      if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
-	  const auto& children = composite.daughtersVector();
-	  const auto& pN = children[N];
+      auto const& bestPV = Sel::getBestPV(composite, vertices);
+      return 1.0;
+      //if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
+	  //const auto& children = composite.daughtersVector();
+	  //const auto& pN = children[N];
 	  //return dist_calc.particleDOCAChi2( pN, tempMother ); 
-	  return 1.0;
-	}
-      else {
-	return 1.0;
-      }
+	  //return 1.0;
+	  //}
+	  //else {
+	  //return 1.0;
+	  //}
     }
   };
 
