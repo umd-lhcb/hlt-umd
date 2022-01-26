@@ -32,6 +32,7 @@
 //let's try
 #include "SelTools/DistanceCalculator.h"
 #include "Gaudi/Algorithm.h"
+#include "SelTools/Utilities.h"                                                              
 
 //added to hardcode DistanceCalculator, will delete
 /*#include "SelKernel/State4.h"
@@ -129,15 +130,10 @@ namespace Functors::detail {
   };  
 
   /**MTDOCACHI2**/
-  //  template <typename DistanceCalculator, typename T, T N>
   struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
-    
-    //static_assert (N>=1, "Indices start from 1 for LoKi compatibility.");
-  
     void bind( TopLevelInfo& top_level ){ 
-      dist_calc = Functors::detail::DefaultDistanceCalculator_t( top_level.algorithm() );
+      dist_calc = Sel::DistanceCalculator(top_level.algorithm() );
     }
-    
     template <typename VContainer, typename Particle> 
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
       auto const& bestPV = Sel::getBestPV(composite, vertices);
@@ -147,77 +143,14 @@ namespace Functors::detail {
 	  const auto& tempMother = composite.clone();
 	  tempMother->setReferencePoint( bestPV.position() );
 	  tempMother->setPosCovMatrix( bestPV.covMatrix() );
-	  //auto results = dist_calc.Lifetime(bestPV, composite);
-	  //return 1.0;
-	  return dist_calc.particleDOCAChi2(*pN, *tempMother);
-	  
-	  //return Sel::DistanceCalculator.particleDOCAChi2(pN, tempMother);
-
-	  
-	  //needed for distance calculator
-	  /*
-	  using StateLocation = LHCb::Event::v3::Tracks::StateLocation;
-	  const auto& sA = Sel::stateVectorFromComposite<*tempMother>;
-	  const auto& sB = Sel::stateVectorFromComposite<*pN>;
-	  if constexpr ( Sel::Utils::has_tracklike_API<tempMother> ) {
-	      sA = tempMother.state( StateLocation::ClosestToBeam );
-	    } else if constexpr ( Sel::type_traits::has_closestToBeamState_v<Particle> ) {
-	      sA = tempMother.closestToBeamState();
-	    }
-	      
-	  if constexpr ( Sel::Utils::has_tracklike_API<pN> ) {
-	      sB = pN.state( StateLocation::ClosestToBeam );
-	    } else if constexpr ( Sel::type_traits::has_closestToBeamState_v<Particle> ) {
-	      sB = pN.closestToBeamState();
-	    }
-
-	  //begin distance calculator, still need to figure out how to not hardcode this
-	  // first compute the cross product of the directions. we'll need this in any case
-	  using float_v     = std::decay_t<decltype( sA.tx() )>;
-	  float_v const txA = sA.tx();
-	  float_v const tyA = sA.ty();
-	  float_v const txB = sB.tx();
-	  float_v const tyB = sB.ty();
-	  float_v const nx  = tyA - tyB;             //   y1 * z2 - y2 * z1
-	  float_v const ny  = txB - txA;             // - x1 * z2 + x2 * z1
-	  float_v const nz  = txA * tyB - tyA * txB; //   x1 * y2 - x2 * y1
-
-	  // compute doca. we don't divide by the normalization to save time. we call it
-	  // 'ndoca'
-	  float_v const dx    = sA.x() - sB.x();
-	  float_v const dy    = sA.y() - sB.y();
-	  float_v const dz    = sA.z() - sB.z();
-	  float_v const ndoca = dx * nx + dy * ny + dz * nz;
-
-	  // the hard part: compute the jacobians :-)
-	  using Vector4 = LHCb::LinAlg::Vec<float_v, 4>;
-	  Vector4 jacA, jacB;
-	  jacA( 0 ) = nx;
-	  jacA( 1 ) = ny;
-	  jacA( 2 ) = -dy + dz * tyB;
-	  jacA( 3 ) = dx - dz * txB;
-	  jacB( 0 ) = -nx;
-	  jacB( 1 ) = -ny;
-	  jacB( 2 ) = dy - dz * tyA;
-	  jacB( 3 ) = -dx + dz * txA;
-
-	  // compute the variance on ndoca
-	  float_v const varndoca =
-	    similarity( jacA, Sel::get::posSlopeCovariance( sA ) ) + similarity( jacB, Sel::get::posSlopeCovariance( sB ) );
-	  
-	  // return the chi2
-	  return ndoca * ndoca / varndoca;
-	  */
-
-	  
-	  //return dist_calc.particleDOCAChi2( pN, tempMother ); 
+	  return dist_calc.particleDOCAChi2(*pN, *tempMother)
 	}
       else {
 	return 1.0;
       }
     }
   private:
-    Functors::detail::DefaultDistanceCalculator_t dist_calc;
+    Sel::DistanceCalculator dist_calc;
   };
   
   /** BPVVDZ */
