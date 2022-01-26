@@ -136,18 +136,18 @@ namespace Functors::detail {
     }
     template <typename VContainer, typename Particle> 
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
-      auto const& bestPV = Sel::getBestPV(composite, vertices);
-      if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
-	  const auto& children = composite.daughtersVector();
-	  const auto& pN = children[0];
-	  const auto& tempMother = composite.clone();
-	  tempMother->setReferencePoint( bestPV.position() );
-	  tempMother->setPosCovMatrix( bestPV.covMatrix() );
-	  return dist_calc.particleDOCAChi2(*pN, *tempMother);
-	}
-      else {
+      //auto const& bestPV = Sel::getBestPV(composite, vertices);
+      //if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
+      // const auto& children = composite.daughtersVector();
+      //  const auto& pN = children[0];
+      //  const auto& tempMother = composite.clone();
+      //  tempMother->setReferencePoint( bestPV.position() );
+      //  tempMother->setPosCovMatrix( bestPV.covMatrix() );
+      //  return dist_calc.particleDOCAChi2(*pN, *tempMother);
+      //	}
+      //else {
 	return 1.0;
-      }
+	//}
     }
   private:
     Functors::detail::DefaultDistanceCalculator_t dist_calc;
