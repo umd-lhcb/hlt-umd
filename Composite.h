@@ -132,7 +132,7 @@ namespace Functors::detail {
   /**MTDOCACHI2**/
   struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
     void bind( TopLevelInfo& top_level ){ 
-      dist_calc = Sel::DistanceCalculator(top_level.algorithm() );
+      dist_calc = Functors::detail::DefaultDistanceCalculator_t(top_level.algorithm() );
     }
     template <typename VContainer, typename Particle> 
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
@@ -143,14 +143,14 @@ namespace Functors::detail {
 	  const auto& tempMother = composite.clone();
 	  tempMother->setReferencePoint( bestPV.position() );
 	  tempMother->setPosCovMatrix( bestPV.covMatrix() );
-	  return dist_calc.particleDOCAChi2(*pN, *tempMother)
+	  return dist_calc.particleDOCAChi2(*pN, *tempMother);
 	}
       else {
 	return 1.0;
       }
     }
   private:
-    Sel::DistanceCalculator dist_calc;
+    Functors::detail::DefaultDistanceCalculator_t dist_calc;
   };
   
   /** BPVVDZ */
