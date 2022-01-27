@@ -1,5 +1,3 @@
-
-
 /*****************************************************************************\
 * (c) Copyright 2019-20 CERN for the benefit of the LHCb Collaboration        *
 *                                                                             *
@@ -34,27 +32,16 @@
 #include "Gaudi/Algorithm.h"
 #include "SelTools/Utilities.h"                                                              
 
-//added to hardcode DistanceCalculator, will delete
-/*#include "SelKernel/State4.h"
-#include "SelKernel/Utilities.h"
-#include "SelKernel/VertexRelation.h"
-#include "SelTools/Utilities.h"
+//adding header files from ParticleCombination.h
+#include "Kernel/HeaderMapping.h"
+#include "SelKernel/ParticleAccessors.h"
+#include "TrackKernel/TrackVertexUtils.h"
 
-#include "Event/Track_v3.h"
-#include "LHCbMath/MatVec.h"
-#include "LHCbMath/MatrixTransforms.h"
-#include "LHCbMath/MatrixUtils.h"
-#include "LHCbMath/SIMDWrapper.h"
+#include <boost/mp11/algorithm.hpp>
+#include <boost/mp11/list.hpp>
 
-#include "Gaudi/Algorithm.h"
-#include "GaudiKernel/GenericMatrixTypes.h"
-#include "GaudiKernel/GenericVectorTypes.h"
-#include "GaudiKernel/PhysicalConstants.h"
-#include "GaudiKernel/Point3DTypes.h"
-#include "GaudiKernel/SymmetricMatrixTypes.h"
-#include "GaudiKernel/Vector3DTypes.h"
-#include "GaudiKernel/Vector4DTypes.h"
-*/
+#include <functional>
+
 
 /** @file  Composite.h
  *  @brief Definitions of functors for composite-particle-like objects.
@@ -132,25 +119,26 @@ namespace Functors::detail {
   /**MTDOCACHI2**/
   struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
     void bind( TopLevelInfo& top_level ){ 
-      dist_calc = Functors::detail::DefaultDistanceCalculator_t(top_level.algorithm() );
+      m_dist_calc.emplace(top_level.algorithm() );
     }
     template <typename VContainer, typename Particle> 
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
-      //auto const& bestPV = Sel::getBestPV(composite, vertices);
-      //if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
-      // const auto& children = composite.daughtersVector();
-      //  const auto& pN = children[0];
-      //  const auto& tempMother = composite.clone();
-      //  tempMother->setReferencePoint( bestPV.position() );
-      //  tempMother->setPosCovMatrix( bestPV.covMatrix() );
-      //  return dist_calc.particleDOCAChi2(*pN, *tempMother);
-      //	}
-      //else {
+      auto const& bestPV = Sel::getBestPV(composite, vertices);
+      if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
+	  const auto& children = composite.daughtersVector();
+	  const auto& pN = children[0];
+	  const auto& tempMother = composite.clone();
+	  tempMother->setReferencePoint( bestPV.position() );
+	  tempMother->setPosCovMatrix( bestPV.covMatrix() );
+	  const auto& dist_calc = *m_dist_calc;
+	  return dist_calc.particleDOCAChi2(*pN, *tempMother);
+      	}
+      else {
 	return 1.0;
-	//}
+      }
     }
   private:
-    Functors::detail::DefaultDistanceCalculator_t dist_calc;
+    std::optional<Functors::detail::DefaultDistanceCalculator_t> m_dist_calc;
   };
   
   /** BPVVDZ */
@@ -167,7 +155,6 @@ namespace Functors::detail {
       // Get the position of end vertex
       using Sel::Utils::endVertexPos;
       return ( endVertexPos( composite ) - getBestPVPosition( composite, vertices ) ).Z();
-      //return 1.0;
     }
   };
 
