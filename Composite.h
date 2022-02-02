@@ -12,6 +12,7 @@
 #include "Event/Particle.h"
 #include "Event/Particle_v2.h"
 #include "Event/State.h"
+#include "Functors/Core.h"
 #include "Functors/Function.h"
 #include "Functors/Utilities.h"
 #include "Kernel/IParticlePropertySvc.h"
@@ -27,12 +28,7 @@
 
 #include <cassert>
 
-//let's try
-#include "SelTools/DistanceCalculator.h"
-#include "Gaudi/Algorithm.h"
-#include "SelTools/Utilities.h"                                                              
-
-//adding header files from ParticleCombination.h
+//from ParticleCombination.h
 #include "Kernel/HeaderMapping.h"
 #include "SelKernel/ParticleAccessors.h"
 #include "TrackKernel/TrackVertexUtils.h"
@@ -41,6 +37,7 @@
 #include <boost/mp11/list.hpp>
 
 #include <functional>
+
 
 
 /** @file  Composite.h
@@ -85,14 +82,14 @@ namespace Functors::detail {
       // Assume that 'composite' is a new-style proxy object
       using float_v = typename Composite::dType::float_v;
       std::array<float, float_v::size()> x, y, z;
-      std::size_t const                  num_valid = popcount( composite.loop_mask() );
+      std::size_t const                  num_valid = popcount( Functors::detail::loop_mask( composite ) );
       for ( auto i = 0ul; i < num_valid; ++i ) {
         x[i] = bestPV[i]->position().x();
         y[i] = bestPV[i]->position().y();
         z[i] = bestPV[i]->position().z();
       }
       for ( auto i = num_valid; i < x.size(); ++i ) { x[i] = y[i] = z[i] = std::numeric_limits<float>::lowest(); }
-      return LHCb::LinAlg::Vec3{float_v{x.data()}, float_v{y.data()}, float_v{z.data()}};
+      return LHCb::LinAlg::Vec3<float_v>{x, y, z};
     } else {
       // If only...
       using Sel::Utils::endVertexPos;
@@ -100,13 +97,12 @@ namespace Functors::detail {
     }
   }
 
-
   struct FlightDistanceChi2ToVertex : public Function {
     /** This allows some error messages to be customised. It is not critical. */
     static constexpr auto name() { return "FlightDistanceChi2ToVertex"; }
 
     template <typename VContainer, typename Particle>
-      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+    auto operator()( VContainer const& vertices, Particle const& composite ) const {
       // Get the associated PV -- this uses a link if it's available and
       // computes the association if it's not.
       auto const& bestPV = Sel::getBestPV( composite, vertices );
@@ -114,7 +110,7 @@ namespace Functors::detail {
       // Now calculate the flight distance chi2 between 'composite' and 'bestPV'
       return Sel::Utils::flightDistanceChi2( composite, bestPV );
     }
-  };  
+  };
 
   /**MTDOCACHI2**/
   struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
@@ -127,12 +123,16 @@ namespace Functors::detail {
       if constexpr (Sel::Utils::is_legacy_particle<Particle>) {
 	  const auto& children = composite.daughtersVector();
 	  const auto& pN = children[0];
+
+	  //move mother to PV
 	  const auto& tempMother = composite.clone();
 	  tempMother->setReferencePoint( bestPV.position() );
 	  tempMother->setPosCovMatrix( bestPV.covMatrix() );
 	  const auto& dist_calc = *m_dist_calc;
+	  //std::cout<<dist_calc.particleDOCAChi2(*pN, *tempMother)<<std::endl;
+	  
 	  return dist_calc.particleDOCAChi2(*pN, *tempMother);
-      	}
+	}
       else {
 	return 1.0;
       }
@@ -140,11 +140,10 @@ namespace Functors::detail {
   private:
     std::optional<Functors::detail::DefaultDistanceCalculator_t> m_dist_calc;
   };
-  
+
   /** BPVVDZ */
   /** origin version in Loki defined in PHYS/PHYS_v25r1/Phys/LoKiPhys/src/Particles20.cpp,
   VertexZDistanceWithTheBestPV function */
-  //template <typename T, T N>
   struct DeltaZToVertex : public Function {
     /** This allows some error messages to be customised. It is not critical. */
     static constexpr auto name() { return "DeltaZToVertex"; }
@@ -307,21 +306,19 @@ namespace Functors::Composite {
   template <typename VContainer = detail::DefaultPVContainer_t>
   auto FlightDistanceChi2ToVertex( std::string vertex_location ) {
     return detail::DataDepWrapper<Function, detail::FlightDistanceChi2ToVertex, VContainer>{
-      std::move( vertex_location )};
+        std::move( vertex_location )};
   }
 
   template <typename VContainer = detail::DefaultPVContainer_t>
     auto MotherTrajectoryDistanceOfClosestApproachChi2( std::string vertex_location ) {
-    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2, VContainer>{std::move( vertex_location )};
+    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2, VContainer>{
+      std::move( vertex_location )};
   }
-  
 
   /** @brief Z component of flight distance of the given composite. */
-  template < typename VContainer = detail::DefaultPVContainer_t >
-  //template <
+  template <typename VContainer = detail::DefaultPVContainer_t>
   auto DeltaZToVertex( std::string vertex_location ) {
-    return detail::DataDepWrapper<Function, detail::DeltaZToVertex, VContainer>
-    {std::move( vertex_location )};
+    return detail::DataDepWrapper<Function, detail::DeltaZToVertex, VContainer>{std::move( vertex_location )};
   }
 
   /** @brief Rho component of flight distance of the given composite. */
@@ -405,7 +402,7 @@ namespace Functors::Composite {
         return sqrt( E * E - threeMomentum( combination ).mag2() );
       }
       // If it's a Combiner::ParticleCombination of v1 particles
-      else if constexpr ( Sel::Utils::is_particlecombination<CombinationType>::value ) {
+      else if constexpr ( Sel::Utils::is_combparticlecombination<CombinationType>::value ) {
         throw std::invalid_argument(
             "Particle combinations not supported in MassWithHypotheses. Use a composite or vertex instead." );
       } else {
