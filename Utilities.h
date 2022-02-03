@@ -37,6 +37,26 @@ namespace Sel {
     s.z()  = deref_if_ptr( p ).z();
     s.tx() = deref_if_ptr( p ).px() * invpz;
     s.ty() = deref_if_ptr( p ).py() * invpz;
+
+    auto Jxpos    = LHCb::LinAlg::initialize_with_zeros<LHCb::LinAlg::Mat<float_v, 2, 3>>();
+    Jxpos( 0, 0 ) = 1.f;
+    Jxpos( 1, 1 ) = 1.f;
+    Jxpos( 0, 2 ) = -s.tx();
+    Jxpos( 1, 2 ) = -s.ty();
+
+    auto Jtxmom    = LHCb::LinAlg::initialize_with_zeros<LHCb::LinAlg::Mat<float_v, 2, 3>>();
+    Jtxmom( 0, 0 ) = invpz;
+    Jtxmom( 1, 1 ) = invpz;
+    Jtxmom( 0, 2 ) = -s.tx() * invpz;
+    Jtxmom( 1, 2 ) = -s.ty() * invpz;
+
+    s.covXX() = similarity( Jxpos, posCovMatrix( deref_if_ptr( p ) ) );
+    s.covTT() = similarity( Jtxmom, threeMomCovMatrix( deref_if_ptr( p ) ) );
+    s.covXT() = Jxpos * threeMomPosCovMatrix( deref_if_ptr( p ) ).transpose() * Jtxmom.transpose();
+
+    
+
+    std::cout<<"posSlopeCov from utils = "<<s.posSlopeCovariance()<<std::endl;
     /*
     //Commenting for now. This ought to moved into a test somewhere, and not calculated on the fly every time one wants to get a state-like vector from a composite.
     // For the computation of the Jacobian it is important to understand the following.
@@ -60,9 +80,6 @@ namespace Sel {
     Jtxmom( 1, 1 ) = invpz;
     Jtxmom( 0, 2 ) = -s.tx() * invpz;
     Jtxmom( 1, 2 ) = -s.ty() * invpz;
-    s.covXX() = similarity( Jxpos, posCovMatrix( deref_if_ptr( p ) ) );
-    s.covTT() = similarity( Jtxmom, threeMomCovMatrix( deref_if_ptr( p ) ) );
-    s.covXT() = Jxpos * threeMomPosCovMatrix( deref_if_ptr( p ) ).transpose() * Jtxmom.transpose();
 
     if constexpr ( false ) {
     // Do the full calculation

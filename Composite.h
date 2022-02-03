@@ -1,3 +1,4 @@
+
 /*****************************************************************************\
 * (c) Copyright 2019-20 CERN for the benefit of the LHCb Collaboration        *
 *                                                                             *
@@ -129,8 +130,7 @@ namespace Functors::detail {
 	  tempMother->setReferencePoint( bestPV.position() );
 	  tempMother->setPosCovMatrix( bestPV.covMatrix() );
 	  const auto& dist_calc = *m_dist_calc;
-	  //std::cout<<dist_calc.particleDOCAChi2(*pN, *tempMother)<<std::endl;
-	  
+	  std::cout<<"bestPV.covMatrix = "<<bestPV.covMatrix()<<std::endl;
 	  return dist_calc.particleDOCAChi2(*pN, *tempMother);
 	}
       else {
