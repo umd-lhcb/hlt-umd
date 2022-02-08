@@ -114,18 +114,6 @@ namespace Sel {
       jacB( 2 ) = dy - dz * tyA;
       jacB( 3 ) = -dx + dz * txA;
 
-      /*      std::cout<<"jacA(0) = "<<jacA(0)<<std::endl;
-      std::cout<<"jacA(1) = "<<jacA(1)<<std::endl;
-      std::cout<<"jacA(2) = "<<jacA(2)<<std::endl;
-      std::cout<<"jacA(3) = "<<jacA(3)<<std::endl;
-      std::cout<<"jacB(0) = "<<jacB(0)<<std::endl;
-      std::cout<<"jacB(1) = "<<jacB(1)<<std::endl;
-      std::cout<<"jacB(2) = "<<jacB(2)<<std::endl;
-      std::cout<<"jacB(3) = "<<jacB(3)<<std::endl;
-      */
-      std::cout<<"posSlopeCovA = "<<get::posSlopeCovariance( sA ) <<std::endl;
-      std::cout<<"posSlopeCovB = "<<get::posSlopeCovariance( sB ) <<std::endl;
-
       // compute the variance on ndoca
       float_v const varndoca =
           similarity( jacA, get::posSlopeCovariance( sA ) ) + similarity( jacB, get::posSlopeCovariance( sB ) );
