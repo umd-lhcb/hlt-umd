@@ -1,0 +1,39 @@
+Hlt2Output:
+   filenames:
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/0/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/11/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/14/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/16/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/20/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/23/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/28/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/3/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/33/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/36/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/39/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/41/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/44/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/48/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/50/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/10/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/12/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/15/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/18/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/22/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/27/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/29/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/31/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/35/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/37/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/40/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/42/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/47/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/49/output/test_b_to_kpi_minbias_with_tck.LDST'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/51/output/test_b_to_kpi_minbias_with_tck.LDST'
+
+   qualifiers:
+      data_type: Upgrade
+      input_type: LDST
+      simulation: true
+      conddb_tag: sim-20171127-vc-md100
+      dddb_tag: dddb-20171126

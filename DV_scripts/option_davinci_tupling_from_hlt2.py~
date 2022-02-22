@@ -1,0 +1,74 @@
+###############################################################################
+# (c) Copyright 2021-2022 CERN for the benefit of the LHCb Collaboration      #
+#                                                                             #
+# This software is distributed under the terms of the GNU General Public      #
+# Licence version 3 (GPL Version 3), copied verbatim in the file "COPYING".   #
+#                                                                             #
+# In applying this licence, CERN does not waive the privileges and immunities #
+# granted to it by virtue of its status as an Intergovernmental Organization  #
+# or submit itself to any jurisdiction.                                       #
+###############################################################################
+"""
+Read an HLT2 file and create an ntuple with the new DaVinci configuration.
+"""
+import Functors as F
+from FunTuple import FunctorCollection
+from FunTuple import FunTuple_Particles as Funtuple
+from DaVinci.reco_objects import make_pvs_for
+from DaVinci import options
+
+branches = {
+    "Bplus": "[B+ -> K+ pi0]CC",
+    "Kplus": "[B+ -> ^K+ pi0]CC",
+    "pi0": "[B+ -> K+ ^pi0]CC",
+}
+
+# Creating v2 reconstructed vertices to be used in the following functor
+v2_pvs = make_pvs_for(process=options.process, data_type=options.data_type)
+variables_all = FunctorCollection({
+    "ID": F.PARTICLE_ID,
+    "PT": F.PT,
+    "PX": F.PX,
+    "PY": F.PY,
+    "PZ": F.PZ,
+    "MASS": F.MASS,
+    "ENERGY": F.ENERGY,
+    "P": F.P,
+    "FOURMOMENTUM": F.FOURMOMENTUM,
+    "MTDOCACHI2": F.MTDOCACHI2(v2_pvs),
+})
+
+daughter_variables = FunctorCollection({
+    "ID": F.PARTICLE_ID,
+    "PT": F.PT,
+    "PX": F.PX,
+    "PY": F.PY,
+    "PZ": F.PZ,
+    "MASS": F.MASS,
+    "ENERGY": F.ENERGY,
+    "P": F.P,
+    "FOURMOMENTUM": F.FOURMOMENTUM,
+    "MTDOCACHI2":F.MTDOCACHI2(v2_pvs),
+})
+
+variables = {
+    "ALL": variables_all,
+}
+
+def main():
+    from DaVinci.algorithms import ConfiguredFuntuple
+
+    config = {
+        "location": "/Event/HLT2/Hlt2BToKpi0_Line/Particles", 
+        "filters": ["HLT_PASS('Hlt2BToKpi0_LineDecision')"],
+        "preamble" : [],
+        "tree": "DecayTree",
+        "branches": branches,
+        "variables":variables,
+    }
+
+    tools = []
+    algs = ConfiguredFunTuple({"BKpi0": config})
+    algs["BKpi0"].insert(0, v2_pvs)
+
+    return algs, tools

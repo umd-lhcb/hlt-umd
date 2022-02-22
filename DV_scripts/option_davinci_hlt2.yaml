@@ -1,0 +1,20 @@
+###############################################################################
+# (c) Copyright 2020-2021 CERN for the benefit of the LHCb Collaboration      #
+#                                                                             #
+# This software is distributed under the terms of the GNU General Public      #
+# Licence version 3 (GPL Version 3), copied verbatim in the file "COPYING".   #
+#                                                                             #
+# In applying this licence, CERN does not waive the privileges and immunities #
+# granted to it by virtue of its status as an Intergovernmental Organization  #
+# or submit itself to any jurisdiction.                                       #
+###############################################################################
+
+annsvc_config: 'my_test_b_to_kpi_minbias.tck.json'
+evt_max: -1 
+histo_file: 'hlt2_histos.root'
+input_raw_format: 0.3
+lumi: false
+ntuple_file: 'hlt2_tuple.root'
+print_freq: 10
+skip_events: 0
+process: 'Hlt2'
