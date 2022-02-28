@@ -220,7 +220,7 @@ namespace Functors::Composite {
 
   template <int N, typename VContainer = detail::DefaultPVContainer_t>
     auto MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<int, N>, std::string vertex_location ) {
-    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2, VContainer>{
+    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2<N>, VContainer>{
       std::move( vertex_location )};
   }
   
