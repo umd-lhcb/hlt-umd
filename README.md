@@ -44,3 +44,13 @@ To run over MC files, find the file you want in bookkeeping by following [this t
 root://eoslhcb.cern.ch//eos/lhcb/grid/prod/INSERT PATH YOU COPIED FROM BOOKKEEPING HERE
 ```
 You may encounter MC files of different formats, [this tutorial](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/different_samples.html) will show you how to handle them--but it won't tell you everything! Also, some of the example options files it gives are inconsistent with what the tutorial says--for example options.input_raw_format is set in the tutorial but not in the example. I used the tutorial setting. It is also missing some things. You need to include two options not mentioned in the tutorial which are ```options.dddb_tag``` and ```options.conddb_tag```. The settings for these are specific to each decay, you can find them by following the instructions [here](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/minimal-dv-job.html) under the heading "Database tags". Errors related to the decoding version can be handled following the instructions [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/different_samples.html#ft-decoding-version).
+
+#Options File
+
+To run over more than one file, there are a few options. At first I was running over files in eos, but I realized not all the MC files were in there. Then, I looked into using a catalog instead, follwing [these](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/files-from-grid.html) instructions under the "read files remotely..." heading. An example of using inputs from eos is [her](https://github.com/umd-lhcb/hlt-umd/blob/139e95f6c6d74769452e5a81d88a84fc5feaf269/test_b_to_kpi_xdigi.py).
+
+#Moore and DaVinci
+
+#Moore and Ganga
+
+I have a modified version of Moore and Rec that I need to use when submitting jobs to Ganga. For this, I use 

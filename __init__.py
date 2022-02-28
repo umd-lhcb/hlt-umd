@@ -17,9 +17,12 @@ FILTER = Functor(
     'Adapt a predicate to filter a container.',
     Params=[('Functor', 'Predicate to filter the container with.',
              BoundFunctor)])
-X = Functor('X', "Track::X", "TrackLike.h", 'X coordinate.')
-Y = Functor('Y', "Track::Y", "TrackLike.h", 'Y coordinate.')
-Z = Functor('Z', "Track::Z", "TrackLike.h", 'Z coordinate.')
+REFERENCEPOINT_X = Functor('REFERENCEPOINT_X', "Track::ReferencePointX",
+                           "TrackLike.h", 'Reference point X coordinate.')
+REFERENCEPOINT_Y = Functor('REFERENCEPOINT_Y', "Track::ReferencePointY",
+                           "TrackLike.h", 'Reference point Y coordinate.')
+REFERENCEPOINT_Z = Functor('REFERENCEPOINT_Z', "Track::ReferencePointZ",
+                           "TrackLike.h", 'Reference point Z coordinate.')
 TX = Functor('TX', "Track::TX", "TrackLike.h", 'X slope.')
 TY = Functor('TY', "Track::TY", "TrackLike.h", 'Y slope.')
 COV = Functor(
@@ -177,30 +180,45 @@ MASSWITHHYPOTHESES = Functor(
     Params=[('Masses', 'Masses of the children', list)])
 MASS = Functor('MASS', 'Composite::Mass', 'Composite.h',
                'Get the particle (composite or basic) mass.')
-VX = Functor('VX', 'Composite::VertexX', 'Composite.h',
-             'Get the particle vertex X. NOT using PV as reference.')
-VY = Functor('VY', 'Composite::VertexY', 'Composite.h',
-             'Get the particle vertex Y. NOT using PV as reference.')
-VZ = Functor('VZ', 'Composite::VertexZ', 'Composite.h',
-             'Get the particle vertex Z. NOT using PV as reference.')
-VRho = Functor(
-    'VRho', 'Composite::VertexRho', 'Composite.h',
-    'Get the particle vertex Rho=sqrt(X*X+Y*Y). NOT using PV as reference.')
-DOCA = Functor(
-    'DOCA',
-    "Combination::DistanceOfClosestApproach",
+
+END_VX = Functor(
+    'END_VX', 'Composite::EndVertexX', 'Composite.h',
+    'Get the (MC)particle end vertex X. NOT using PV as reference.')
+END_VY = Functor(
+    'END_VY', 'Composite::EndVertexY', 'Composite.h',
+    'Get the (MC)particle end vertex Y. NOT using PV as reference.')
+END_VZ = Functor(
+    'END_VZ', 'Composite::EndVertexZ', 'Composite.h',
+    'Get the (MC)particle end vertex Z. NOT using PV as reference.')
+
+END_VRho = Functor(
+    'END_VRho', 'Composite::EndVertexRho', 'Composite.h',
+    'Get the particle end vertex Rho=sqrt(X*X+Y*Y). NOT using PV as reference.'
+)
+
+SDOCA = Functor(
+    'SDOCA',
+    "Combination::SDistanceOfClosestApproach",
     "Combination.h",
     """Compute the distance of closest approach between two 'states'.""",
     Params=[('Child1',
              'Index [starting from 1] of the first child to consider.', int),
             ('Child2',
              'Index [starting from 1] of the second child to consider.', int)],
-    TemplateParams=[('DistanceCalculator',
-                     'Distance calculator implementation to use.')],
     AllowMultiplePositionalArguments=True)
-DOCACHI2 = Functor(
-    'DOCACHI2',
-    "Combination::DistanceOfClosestApproachChi2",
+DOCA = Functor(
+    'DOCA',
+    "Combination::DistanceOfClosestApproach",
+    "Combination.h",
+    """Compute the distance of closest approach between two track-like objects which may need transport over longer distances.""",
+    Params=[('Child1',
+             'Index [starting from 1] of the first child to consider.', int),
+            ('Child2',
+             'Index [starting from 1] of the second child to consider.', int)],
+    AllowMultiplePositionalArguments=True)
+SDOCACHI2 = Functor(
+    'SDOCACHI2',
+    "Combination::SDistanceOfClosestApproachChi2",
     "Combination.h",
     """Compute the significance of the distance of closest
     approach between two 'states'.""",
@@ -208,20 +226,79 @@ DOCACHI2 = Functor(
              'Index [starting from 1] of the first child to consider.', int),
             ('Child2',
              'Index [starting from 1] of the second child to consider.', int)],
-    TemplateParams=[('DistanceCalculator',
-                     'Distance calculator implementation to use.')],
     AllowMultiplePositionalArguments=True)
-
+DOCACHI2 = Functor(
+    'DOCACHI2',
+    "Combination::DistanceOfClosestApproachChi2",
+    "Combination.h",
+    """Compute the significance of the distance of closest
+    approach between two track-like object which may need transport.""",
+    Params=[('Child1',
+             'Index [starting from 1] of the first child to consider.', int),
+            ('Child2',
+             'Index [starting from 1] of the second child to consider.', int)],
+    AllowMultiplePositionalArguments=True)
+MAXSDOCA = Functor(
+    'MAXSDOCA',
+    "Combination::MaxSDistanceOfClosestApproach",
+    "Combination.h",
+    """Compute the maximum pairwise distance of closest approach between members of a combination.""",
+    Params=[],
+    AllowMultiplePositionalArguments=True)
+MAXDOCA = Functor(
+    'MAXDOCA',
+    "Combination::MaxDistanceOfClosestApproach",
+    "Combination.h",
+    "Compute the maximum pairwise distance of closest approach between members of a combination using IDistanceCalculator.",
+    Params=[],
+    AllowMultiplePositionalArguments=True)
+MAXSDOCACHI2 = Functor(
+    'MAXSDOCACHI2', "Combination::MaxSDistanceOfClosestApproachChi2",
+    "Combination.h",
+    "Compute the maximum pairwise significance of the distance of closest approach between members of a combination."
+)
+MAXDOCACHI2 = Functor(
+    'MAXDOCACHI2', "Combination::MaxDistanceOfClosestApproachChi2",
+    "Combination.h",
+    "Compute the maximum pairwise significance of the distance of closest approach, computed using an IDistanceCalculator implementation,  between members of a combination."
+)
+MAXSDOCACUT = Functor(
+    'MAXSDOCACUT',
+    "Combination::MaxSDistanceOfClosestApproachCut",
+    "Combination.h",
+    """Cut on the the distance of closest approach between two 'states'.""",
+    Params=[('thresh', 'Threshold for cut', float)])
+MAXDOCACUT = Functor(
+    'MAXDOCACUT',
+    "Combination::MaxDistanceOfClosestApproachCut",
+    "Combination.h",
+    """Cut on the the distance of closest approach between two track-like objects which may need transport.""",
+    Params=[('thresh', 'Threshold for cut', float)])
+MAXSDOCACHI2CUT = Functor(
+    'MAXSDOCACHI2CUT',
+    "Combination::MaxSDistanceOfClosestApproachChi2Cut",
+    "Combination.h",
+    """Cut on the significance of the distance of closest
+    approach between two 'states'.""",
+    Params=[('thresh', 'Threshold for cut', float)])
+MAXDOCACHI2CUT = Functor(
+    'MAXDOCACHI2CUT',
+    "Combination::MaxDistanceOfClosestApproachChi2Cut",
+    "Combination.h",
+    """Cut on the significance of the distance of closest approach between two track-like object which may need transport.""",
+    Params=[('thresh', 'Threshold for cut', float)])
 MTDOCACHI2 = Functor(
     'MTDOCACHI2',
     "Composite::MotherTrajectoryDistanceOfClosestApproachChi2",
     "Composite.h",
     """Compute the significance of the distance of closest
     approach between mother and child.""",
-    Params=[('Vertices', 'TES location of input [primary] vertices.', DataHandle)],
+    Params=[#('Child',
+        #'Index [starting from 1] of the first child to consider.', int),]
+        ('Vertices', 'TES location of input [primary] vertices.', DataHandle)],
     TemplateParams=[('VerticesType', 'Input vertex container type')]
+    #AllowMultiplePositionalArguments=True
 )
-
 ALV = Functor(
     'ALV',
     "Combination::CosAngleBetweenDecayProducts",
@@ -232,28 +309,6 @@ ALV = Functor(
             ('Child2',
              'Index [starting from 1] of the second child to consider.', int)],
     AllowMultiplePositionalArguments=True)
-MAXDOCA = Functor(
-    'DOCA', "Combination::MaxDistanceOfClosestApproach", "Combination.h",
-    "Compute the maximum pairwise distance of closest approach between members of a combination."
-)
-MAXDOCACHI2 = Functor(
-    'MAXDOCACHI2', "Combination::MaxDistanceOfClosestApproachChi2",
-    "Combination.h",
-    "Compute the maximum pairwise significance of the distance of closest approach between members of a combination."
-)
-MAXDOCACUT = Functor(
-    'MAXDOCACUT',
-    "Combination::MaxDistanceOfClosestApproachCut",
-    "Combination.h",
-    """Cut on the the distance of closest approach between two 'states'.""",
-    Params=[('thresh', 'Threshold for cut', float)])
-MAXDOCACHI2CUT = Functor(
-    'MAXDOCACHI2CUT',
-    "Combination::MaxDistanceOfClosestApproachChi2Cut",
-    "Combination.h",
-    """Cut on the significance of the distance of closest
-    approach between two 'states'.""",
-    Params=[('thresh', 'Threshold for cut', float)])
 CHARGE = Functor("CHARGE", "Combination::Charge", "Combination.h",
                  "Compute the charge")
 PID_MU = Functor('PID_MU', "Track::PIDmu", "TrackLike.h", "CombDLLmu.")
@@ -307,6 +362,16 @@ BPVDIRA = Functor(
     Params=[('Vertices', 'TES location of input [primary] vertices.',
              DataHandle)],
     TemplateParams=[('VerticesType', 'Input vertex container type')])
+BPVIP = Functor(
+    'BPVIP',
+    'Track::ImpactParameterToVertex',
+    'TrackLike.h',
+    '''Return the impact parameter w.r.t. the associated vertex, assuming
+    that it is from the container of vertices that is passed. If no association
+    is available, compute one.''',
+    Params=[('Vertices', 'TES location of input [primary] vertices.',
+             DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')])
 BPVIPCHI2 = Functor(
     'BPVIPCHI2',
     'Track::ImpactParameterChi2ToVertex',
@@ -336,7 +401,6 @@ BPVVDZ = Functor(
     ''',
     Params=[('Vertices', 'TES location of input [primary] vertices.',
              DataHandle)],
-            #('Child', 'Index [starting from 1] of the child to consider.', int)],
     TemplateParams=[('VerticesType', 'Input vertex container type')])
 BPVVDRHO = Functor(
     'BPVVDRHO',
@@ -356,8 +420,7 @@ BPVLTIME = Functor(
     that it is from the container of vertices that is passed. If no association
     is available, compute one.''',
     Params=[('Vertices', 'TES location of input [primary] vertices.',
-             DataHandle),
-        ],
+             DataHandle)],
     TemplateParams=[
         ('VerticesType', 'Input vertex container type'),
     ])
@@ -484,11 +547,69 @@ POD = Functor(
     Params=[('Functor', 'The functor to convert the return value of.',
              BoundFunctor)])
 
-MAP_INPUT = Functor(
+PARTICLE_ID = Functor('PARTICLE_ID', 'Simulation::Particle_Id', 'Simulation.h',
+                      "Particle ID of a Particle or MCParticle.")
+OBJECT_KEY = Functor('OBJECT_KEY', 'TES::ObjectKey', 'TES.h',
+                     "Key of the KeyedObject.")
+BKGCAT = Functor(
+    'BKGCAT',
+    'Simulation::Background_Category',
+    'Simulation.h',
+    '''Background category of composite particle.''',
+    Params=
+    [('Relations',
+      'TES location of the relation table mapping the composite to background category',
+      DataHandle)])
+
+MAP_INPUT_ = Functor(
     'MAP_INPUT',
-    'Adapters::ParticleMapper',
+    'Adapters::MapRelInputToFunOutput',
     'Adapters.h',
-    '''Get the mass of a refitted candidate given the location of the output
-       particles from DecayTreeFitterAlg.''',
+    '''Map the input object to the related object (via relations table) and apply functor to it.''',
     Params=[('Functor', "The functor to apply to the particle.", BoundFunctor),
-            ('Relations', 'TES location of relation table', DataHandle)])
+            ('Relations', 'TES location of relation table', DataHandle)],
+    TemplateParams=[('RelationsType',
+                     'A string specifying the relation table type')])
+
+
+def MAP_INPUT(Functor: BoundFunctor, Relations: DataHandle) -> BoundFunctor:
+    """Helper function to create :py:func:`~Functors.MAP_INPUT_` functor
+
+    Args:
+        Functor: The functor to apply to the particle
+        Relations: Datahandle of the relations table
+
+    Returns:
+        The result of invoking
+
+        `MAP_INPUT_(Functor=Functor, Relations=Relations, RelationsType=Relations.type)`
+
+
+    """
+
+    return MAP_INPUT_(
+        Functor=Functor, Relations=Relations, RelationsType=Relations.type)
+
+
+MC_MOTHER = Functor(
+    'MC_MOTHER',
+    "Simulation::MC::Mother",
+    "Simulation.h",
+    "Apply functor on mother.",
+    Params=[
+        ('Generation',
+         'The generation of the mother. Generation 1 is simply Mother, Generation 2 is Grandmother and so on.',
+         int),
+        ('Functor', 'The functor to apply on the mother.', BoundFunctor),
+    ],
+    AllowMultiplePositionalArguments=True)
+
+ORIGIN_VX = Functor("ORIGIN_VX", "Simulation::MC::OriginVertexX",
+                    "Simulation.h",
+                    "Get the origin vertex X position of a MCparticle.")
+ORIGIN_VY = Functor("ORIGIN_VY", "Simulation::MC::OriginVertexY",
+                    "Simulation.h",
+                    "Get the origin vertex Y position of a MCparticle.")
+ORIGIN_VZ = Functor("ORIGIN_VZ", "Simulation::MC::OriginVertexZ",
+                    "Simulation.h",
+                    "Get the origin vertex Z position of a MCparticle.")
