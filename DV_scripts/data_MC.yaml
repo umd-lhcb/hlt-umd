@@ -1,0 +1,17 @@
+Hlt2Output:
+   filenames:
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/0/output/test_b_to_kp#i_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/1/output/test_b_to_kpi_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/2/output/test_b_to_kp#i_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/3/output/test_b_to_kpi_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/4/output/test_b_to_kpi_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/5/output/test_b_to_kpi_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/6/output/test_b_to_kpi_MC_with_tck.ldst'
+   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/7/output/test_b_to_kpi_MC_with_tck.ldst'
+
+   qualifiers:
+      data_type: Upgrade
+      input_type: LDST
+      simulation: true
+      conddb_tag: sim-20201218-vc-md100
+      dddb_tag: dddb-20201211

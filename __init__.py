@@ -287,17 +287,26 @@ MAXDOCACHI2CUT = Functor(
     "Combination.h",
     """Cut on the significance of the distance of closest approach between two track-like object which may need transport.""",
     Params=[('thresh', 'Threshold for cut', float)])
+MTDOCA = Functor(
+    'MTDOCA',
+    "Composite::MotherTrajectoryDistanceOfClosestApproach",
+    "Composite.h",
+    """Compute the distance of closest approach between mother and child.""",
+    Params=[('Child',
+             'Index [starting from 1] of the first child to consider.', int),
+            ('Vertices', 'TES location of input [primary] vertices.', DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')]
+)
 MTDOCACHI2 = Functor(
     'MTDOCACHI2',
     "Composite::MotherTrajectoryDistanceOfClosestApproachChi2",
     "Composite.h",
     """Compute the significance of the distance of closest
     approach between mother and child.""",
-    Params=[#('Child',
-        #'Index [starting from 1] of the first child to consider.', int),]
-        ('Vertices', 'TES location of input [primary] vertices.', DataHandle)],
+    Params=[('Child',
+             'Index [starting from 1] of the first child to consider.', int),
+            ('Vertices', 'TES location of input [primary] vertices.', DataHandle)],
     TemplateParams=[('VerticesType', 'Input vertex container type')]
-    #AllowMultiplePositionalArguments=True
 )
 ALV = Functor(
     'ALV',
@@ -389,6 +398,56 @@ BPVFDCHI2 = Functor(
     '''Return the flight distance chi2 w.r.t. the associated vertex, assuming
     that it is from the container of vertices that is passed. If no association
     is available, compute one.''',
+    Params=[('Vertices', 'TES location of input [primary] vertices.',
+             DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')])
+BPVFD = Functor(
+    'BPVFD',
+    'Composite::FlightDistanceToVertex',
+    'Composite.h',
+    '''Return the magnitude of the xyz vector of flight distance w.r.t. the associated vertex, assuming
+    that it is from the container of vertices that is passed.
+    ''',
+    Params=[('Vertices', 'TES location of input [primary] vertices.',
+             DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')])
+BPVFDVEC = Functor(
+    'BPVFDVEC',
+    'Composite::FlightDistanceVectorToVertex',
+    'Composite.h',
+    '''Return the xyz vector of flight distance w.r.t. the associated vertex, assuming
+    that it is from the container of vertices that is passed.
+    ''',
+    Params=[('Vertices', 'TES location of input [primary] vertices.',
+             DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')])
+BPVFDIR = Functor(
+    'BPVFDIR',
+    'Composite::FlightDirectionVectorToVertex',
+    'Composite.h',
+    '''Return the xyz unit vector of flight distance w.r.t. the associated vertex, assuming
+    that it is from the container of vertices that is passed.
+    ''',
+    Params=[('Vertices', 'TES location of input [primary] vertices.',
+             DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')])
+BPVVDX = Functor(
+    'BPVVDX',
+    'Composite::DeltaXToVertex',
+    'Composite.h',
+    '''Return the x component of flight distance w.r.t. the associated vertex, assuming
+    that it is from the container of vertices that is passed.
+    ''',
+    Params=[('Vertices', 'TES location of input [primary] vertices.',
+             DataHandle)],
+    TemplateParams=[('VerticesType', 'Input vertex container type')])
+BPVVDY = Functor(
+    'BPVVDY',
+    'Composite::DeltaYToVertex',
+    'Composite.h',
+    '''Return the t component of flight distance w.r.t. the associated vertex, assuming
+    that it is from the container of vertices that is passed.
+    ''',
     Params=[('Vertices', 'TES location of input [primary] vertices.',
              DataHandle)],
     TemplateParams=[('VerticesType', 'Input vertex container type')])
@@ -613,3 +672,12 @@ ORIGIN_VY = Functor("ORIGIN_VY", "Simulation::MC::OriginVertexY",
 ORIGIN_VZ = Functor("ORIGIN_VZ", "Simulation::MC::OriginVertexZ",
                     "Simulation.h",
                     "Get the origin vertex Z position of a MCparticle.")
+
+IS_PHOTON = Functor('IS_PHOTON', "Neutral::IsPhoton_t", "NeutralLike.h",
+                    "IS_PHOTON.")
+IS_NOT_E = Functor('IS_NOT_E', "Neutral::IsNotE_t", "NeutralLike.h",
+                   "IS_NOT_E.")
+IS_NOT_H = Functor('IS_NOT_H', "Neutral::IsNotH_t", "NeutralLike.h",
+                   "IS_NOT_H.")
+SHOWER_SHAPE = Functor('SHOWER_SHAPE', "Neutral::ShowerShape_t",
+                       "NeutralLike.h", "SHOWER_SHAPE.")

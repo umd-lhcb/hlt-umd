@@ -17,7 +17,7 @@ from FunTuple import FunTuple_Particles as Funtuple
 from DaVinci.reco_objects import make_pvs_for
 from DaVinci import options
 
-branches = {
+fields = {
     "Bplus": "[B+ -> K+ pi0]CC",
     "Kplus": "[B+ -> ^K+ pi0]CC",
     "pi0": "[B+ -> K+ ^pi0]CC",
@@ -35,20 +35,7 @@ variables_all = FunctorCollection({
     "ENERGY": F.ENERGY,
     "P": F.P,
     "FOURMOMENTUM": F.FOURMOMENTUM,
-    "MTDOCACHI2": F.MTDOCACHI2(v2_pvs),
-})
-
-daughter_variables = FunctorCollection({
-    "ID": F.PARTICLE_ID,
-    "PT": F.PT,
-    "PX": F.PX,
-    "PY": F.PY,
-    "PZ": F.PZ,
-    "MASS": F.MASS,
-    "ENERGY": F.ENERGY,
-    "P": F.P,
-    "FOURMOMENTUM": F.FOURMOMENTUM,
-    "MTDOCACHI2":F.MTDOCACHI2(v2_pvs),
+    #"MTDOCACHI2": F.MTDOCACHI2(v2_pvs),
 })
 
 variables = {
@@ -62,8 +49,8 @@ def main():
         "location": "/Event/HLT2/Hlt2BToKpi0_Line/Particles", 
         "filters": ["HLT_PASS('Hlt2BToKpi0_LineDecision')"],
         "preamble" : [],
-        "tree": "DecayTree",
-        "branches": branches,
+        "tuple": "DecayTree",
+        "fields": fields,
         "variables":variables,
     }
 

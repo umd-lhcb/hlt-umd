@@ -1,6 +1,5 @@
 Hlt2Output:
    filenames:
-   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/0/output/test_b_to_kpi_minbias_with_tck.LDST'
    - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/11/output/test_b_to_kpi_minbias_with_tck.LDST'
    - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/14/output/test_b_to_kpi_minbias_with_tck.LDST'
    - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/16/output/test_b_to_kpi_minbias_with_tck.LDST'
@@ -29,7 +28,7 @@ Hlt2Output:
    - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/42/output/test_b_to_kpi_minbias_with_tck.LDST'
    - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/47/output/test_b_to_kpi_minbias_with_tck.LDST'
    - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/49/output/test_b_to_kpi_minbias_with_tck.LDST'
-   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/51/output/test_b_to_kpi_minbias_with_tck.LDST'
+#   - '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/51/output/test_b_to_kpi_minbias_with_tck.LDST'
 
    qualifiers:
       data_type: Upgrade

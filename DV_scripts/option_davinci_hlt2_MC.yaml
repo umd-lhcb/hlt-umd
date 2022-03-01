@@ -9,12 +9,12 @@
 # or submit itself to any jurisdiction.                                       #
 ###############################################################################
 
-annsvc_config: '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/6/11/output/my_test_b_to_kpi_minbias.tck.json'
+annsvc_config: '/afs/cern.ch/user/e/ejiang/gangadir/workspace/ejiang/LocalXML/16/1/output/my_test_b_to_kpi_MC.tck.json'
 evt_max: -1 
-histo_file: 'hlt2_histos.root'
+histo_file: 'hlt2_MC_histos.root'
 input_raw_format: 0.3
 lumi: false
-ntuple_file: 'hlt2_tuple.root'
+ntuple_file: 'hlt2_MC_tuple.root'
 print_freq: 10
 skip_events: 0
 process: 'Hlt2'

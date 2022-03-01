@@ -1,4 +1,4 @@
-/***************************************************************************** \
+/*****************************************************************************\
  * (c) Copyright 2019-20 CERN for the benefit of the LHCb Collaboration        *
  *                                                                             *
  * This software is distributed under the terms of the GNU General Public      *
@@ -19,12 +19,9 @@
 #include "SelKernel/Utilities.h"
 #include "SelKernel/VertexRelation.h"
 
-//from old Composite.h
+//files for MTDOCACHI2 
 #include "Event/Particle.h"
 #include "Event/Particle_v2.h"
-//#include "SelKernel/ParticleTraits.h"
-//#include "SelKernel/VectorOps.h"
-//#include "TrackKernel/TrackCompactVertex.h"
 #include "Functors/TrackLike.h"
 
 /** @file  Composite.h
@@ -37,20 +34,48 @@
  *  vertex as well as a trajectory)
  */
 namespace Functors::detail {
-  /**MTDOCACHI2**/
+  /**MTDOCA**/
   template<int N>
-  struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
-    MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<int, N> ) {}
-    void bind( TopLevelInfo& top_level ){
-      m_dist_calc.emplace(top_level.algorithm() );
-    }
+    struct MotherTrajectoryDistanceOfClosestApproach : public Function {
+    static_assert( N >= 1, "Indices start from 1 for LoKi compatibility." );
+    MotherTrajectoryDistanceOfClosestApproach( std::integral_constant<int, N> = {} ) {}
+
+    void bind( TopLevelInfo& top_level ){ m_dist_calc.emplace(top_level.algorithm() ); }
+
     template <typename VContainer, typename Particle>
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
       auto const bestPV = Sel::getBestPV(composite, vertices);
       if constexpr (Functors::is_legacy_particle<Particle>) {
 	  const auto children( composite.daughtersVector() );
           const auto pN = *children[0];
-          //move mother to PV                                                                
+	  std::unique_ptr<LHCb::Particle> tempMother( composite.clone() );
+          tempMother->setReferencePoint( bestPV.position() );
+          tempMother->setPosCovMatrix( bestPV.covMatrix() );
+          const auto& dist_calc = *m_dist_calc;
+          return dist_calc.particleDOCA(pN, *tempMother);
+        }
+      else {
+        throw GaudiException{"v2 particles not yet supported.", "Functors::detail:MotherTrajectoryDistanceOfClosestApproachChi2", StatusCode::FAILURE};
+      }
+    }
+  private:
+    std::optional<Functors::detail::DefaultDistanceCalculator_t> m_dist_calc;
+  };
+
+  /**MTDOCACHI2**/
+  template<int N>
+    struct MotherTrajectoryDistanceOfClosestApproachChi2 : public Function {
+    static_assert( N >= 1, "Indices start from 1 for LoKi compatibility." );    
+    MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<int, N> = {} ) {}
+
+    void bind( TopLevelInfo& top_level ){ m_dist_calc.emplace(top_level.algorithm() ); }
+
+    template <typename VContainer, typename Particle>
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      auto const bestPV = Sel::getBestPV(composite, vertices);
+      if constexpr (Functors::is_legacy_particle<Particle>) {
+	  const auto children( composite.daughtersVector() );
+          const auto pN = *children[0];
 	  std::unique_ptr<LHCb::Particle> tempMother( composite.clone() );
           tempMother->setReferencePoint( bestPV.position() );
           tempMother->setPosCovMatrix( bestPV.covMatrix() );
@@ -65,7 +90,6 @@ namespace Functors::detail {
     std::optional<Functors::detail::DefaultDistanceCalculator_t> m_dist_calc;
   };
 
-
   struct FlightDistanceChi2ToVertex : public Function {
     /** This allows some error messages to be customised. It is not critical. */
     static constexpr auto name() { return "FlightDistanceChi2ToVertex"; }
@@ -74,6 +98,78 @@ namespace Functors::detail {
       auto operator()( VContainer const& vertices, Particle const& composite ) const {
       // Get the associated PV and calculate the flight distance chi2 between 'composite' and 'bestPV'
       return Sel::Utils::flightDistanceChi2( composite, Sel::getBestPV( composite, vertices ) );
+    }
+  };
+
+  /** BPVFD */
+  struct FlightDistanceToVertex : public Function {
+    /** This allows some error messages to be customised. It is not critical. */
+    static constexpr auto name() { return "FlightDistanceToVertex"; }
+
+    template <typename VContainer, typename Particle>
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      using Sel::Utils::endVertexPos;
+      auto const& bestPV_position = endVertexPos( Sel::getBestPV( composite, vertices ) );
+      auto const& decay_vertex_v2 = endVertexPos( composite );
+      // The flight direction vector
+      auto const flight = decay_vertex_v2 - bestPV_position;
+      return flight.mag();
+    }
+  };
+
+  /** BPVFDVEC */
+  struct FlightDistanceVectorToVertex : public Function {
+    /** This allows some error messages to be customised. It is not critical. */
+    static constexpr auto name() { return "FlightDistanceVectorToVertex"; }
+
+    template <typename VContainer, typename Particle>
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      using Sel::Utils::endVertexPos;
+      auto const& bestPV_position = endVertexPos( Sel::getBestPV( composite, vertices ) );
+      auto const& decay_vertex_v2 = endVertexPos( composite );
+      // The flight distance vector
+      auto const flight = decay_vertex_v2 - bestPV_position;
+      return flight;
+    }
+  };
+
+  /** BPVFDIR */
+  struct FlightDirectionVectorToVertex : public Function {
+    /** This allows some error messages to be customised. It is not critical. */
+    static constexpr auto name() { return "FlightDirectionVectorToVertex"; }
+
+    template <typename VContainer, typename Particle>
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      using Sel::Utils::endVertexPos;
+      auto const& bestPV_position = endVertexPos( Sel::getBestPV( composite, vertices ) );
+      auto const& decay_vertex_v2 = endVertexPos( composite );
+      // The flight distance vector
+      auto const flight = decay_vertex_v2 - bestPV_position;
+      return flight / flight.mag();
+    }
+  };
+
+  /** BPVVDX */
+  struct DeltaXToVertex : public Function {
+    /** This allows some error messages to be customised. It is not critical. */
+    static constexpr auto name() { return "DeltaXToVertex"; }
+
+    template <typename VContainer, typename Particle>
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      using Sel::Utils::endVertexPos;
+      return ( endVertexPos( composite ) - endVertexPos( Sel::getBestPV( composite, vertices ) ) ).X();
+    }
+  };
+
+  /** BPVVDY */
+  struct DeltaYToVertex : public Function {
+    /** This allows some error messages to be customised. It is not critical. */
+    static constexpr auto name() { return "DeltaYToVertex"; }
+
+    template <typename VContainer, typename Particle>
+      auto operator()( VContainer const& vertices, Particle const& composite ) const {
+      using Sel::Utils::endVertexPos;
+      return ( endVertexPos( composite ) - endVertexPos( Sel::getBestPV( composite, vertices ) ) ).Y();
     }
   };
 
@@ -211,23 +307,62 @@ namespace Functors::detail {
 } // namespace Functors::detail
 
 namespace Functors::Composite {
-  /** @brief Flight distance chi2 to the "best" one of the given vertices.
-   *
-   *  Note that if the given data object contains a vertex link then that will
-   *  be checked for compatibility with the given vertex container and, if it
-				     *  matches, be used.
-   */
+/** @brief mother trajectory distance of closest approach */
+  template <int N, typename VContainer = detail::DefaultPVContainer_t>
+    auto MotherTrajectoryDistanceOfClosestApproach( std::integral_constant<int, N>, std::string vertex_location ) {
+    return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproach<N>, VContainer>{
+      std::move( vertex_location )};
+  }
 
+  /** @brief mother trajectory distance of closest approach chi2 value */
   template <int N, typename VContainer = detail::DefaultPVContainer_t>
     auto MotherTrajectoryDistanceOfClosestApproachChi2( std::integral_constant<int, N>, std::string vertex_location ) {
     return detail::DataDepWrapper<Function, detail::MotherTrajectoryDistanceOfClosestApproachChi2<N>, VContainer>{
       std::move( vertex_location )};
   }
-  
+
+  /** @brief Flight distance chi2 to the "best" one of the given vertices.
+   *
+   *  Note that if the given data object contains a vertex link then that will
+   *  be checked for compatibility with the given vertex container and, if it
+   *  matches, be used.
+   */
   template <typename VContainer = detail::DefaultPVContainer_t>
     auto FlightDistanceChi2ToVertex( std::string vertex_location ) {
     return detail::DataDepWrapper<Function, detail::FlightDistanceChi2ToVertex, VContainer>{
       std::move( vertex_location )};
+  }
+
+  /** @brief magnitude of XYZ vector of flight distance of the given composite. */
+  template <typename VContainer = detail::DefaultPVContainer_t>
+    auto FlightDistanceToVertex( std::string vertex_location ) {
+    return detail::DataDepWrapper<Function, detail::FlightDistanceToVertex, VContainer>{std::move( vertex_location )};
+  }
+
+  /** @brief XYZ vector of flight distance of the given composite. */
+  template <typename VContainer = detail::DefaultPVContainer_t>
+    auto FlightDistanceVectorToVertex( std::string vertex_location ) {
+    return detail::DataDepWrapper<Function, detail::FlightDistanceVectorToVertex, VContainer>{
+      std::move( vertex_location )};
+  }
+
+  /** @brief XYZ unit vector of flight distance direction of the given composite. */
+  template <typename VContainer = detail::DefaultPVContainer_t>
+    auto FlightDirectionVectorToVertex( std::string vertex_location ) {
+    return detail::DataDepWrapper<Function, detail::FlightDirectionVectorToVertex, VContainer>{
+      std::move( vertex_location )};
+  }
+
+  /** @brief X component of flight distance of the given composite. */
+  template <typename VContainer = detail::DefaultPVContainer_t>
+    auto DeltaXToVertex( std::string vertex_location ) {
+    return detail::DataDepWrapper<Function, detail::DeltaXToVertex, VContainer>{std::move( vertex_location )};
+  }
+
+  /** @brief Y component of flight distance of the given composite. */
+  template <typename VContainer = detail::DefaultPVContainer_t>
+    auto DeltaYToVertex( std::string vertex_location ) {
+    return detail::DataDepWrapper<Function, detail::DeltaYToVertex, VContainer>{std::move( vertex_location )};
   }
 
   /** @brief Z component of flight distance of the given composite. */
