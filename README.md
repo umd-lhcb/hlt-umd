@@ -1,10 +1,11 @@
 # Building Moore
 
-To build Moore, follow the steps [here](https://gitlab.cern.ch/rmatev/lb-stack-setup) up through compile. Use the latest version of the master branch. If you would like to use a nonstandard branch, follow instructions [here](https://gitlab.cern.ch/lhcb/Moore/-/blob/bnoc_run3/Hlt/Hlt2Conf/python/Hlt2Conf/lines/bnoc/README.md) but be aware that there may be bugs--for example, I was not able to run the example line on the bnoc_run3 branch without updating to master. To update to master, I used the command 
+To build Moore, follow the steps [here](https://gitlab.cern.ch/rmatev/lb-stack-setup) up through compile. Use the latest version of the master branch. If you would like to use a nonstandard branch, follow instructions [here](https://gitlab.cern.ch/lhcb/Moore/-/blob/bnoc_run3/Hlt/Hlt2Conf/python/Hlt2Conf/lines/bnoc/README.md) but be aware that it may not run--for example, the `bnoc_run3` branch is often out of date. To update to master, I used the command 
 
 ```
-git merge origin/master
+git merge origin master
 ```
+Best practice would be to develop with a local copy of the master branch.
 
 # Writing the HLT2 Line
 
@@ -32,6 +33,8 @@ return ParticleCombiner(
     )
 ```
 
+Once the line is complete, a branch and merge request should be opened in the relevant branch, following the guidelines [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/selection/hlt2_guidelines.html#summary). As an example, here is my 
+
 # Running 
 To run the code, you must write an options file. I put mine in the directory 'stack' which contains all the projects, but eventually it will go into a directory containing all the options files 
 ```
@@ -45,13 +48,33 @@ root://eoslhcb.cern.ch//eos/lhcb/grid/prod/INSERT PATH YOU COPIED FROM BOOKKEEPI
 ```
 You may encounter MC files of different formats, [this tutorial](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/different_samples.html) will show you how to handle them--but it won't tell you everything! Also, some of the example options files it gives are inconsistent with what the tutorial says--for example options.input_raw_format is set in the tutorial but not in the example. I used the tutorial setting. It is also missing some things. You need to include two options not mentioned in the tutorial which are ```options.dddb_tag``` and ```options.conddb_tag```. The settings for these are specific to each decay, you can find them by following the instructions [here](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/minimal-dv-job.html) under the heading "Database tags". Errors related to the decoding version can be handled following the instructions [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/different_samples.html#ft-decoding-version).
 
-#Options File
+# Options File
 
-To run over more than one file, there are a few options. At first I was running over files in eos, but I realized not all the MC files were in there. Then, I looked into using a catalog instead, follwing [these](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/files-from-grid.html) instructions under the "read files remotely..." heading. An example of using inputs from eos is [her](https://github.com/umd-lhcb/hlt-umd/blob/139e95f6c6d74769452e5a81d88a84fc5feaf269/test_b_to_kpi_xdigi.py).
+To run over more than one file, there are a few options. At first I was running over files in eos, but I realized not all the MC files were in there. Then, I looked into using a catalog instead, follwing [these](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/files-from-grid.html) instructions under the "read files remotely..." heading. An example of using inputs from eos is [here](https://github.com/umd-lhcb/hlt-umd/blob/139e95f6c6d74769452e5a81d88a84fc5feaf269/test_b_to_kpi_xdigi.py).
 
-#Moore and DaVinci
+# Moore and DaVinci
 
-#Moore and Ganga
+I only ran DaVinci on lxplus since the LDST file produced after applying my HLT only had a few hundred events. I created the DaVinci script following [this example](https://gitlab.cern.ch/lhcb/DaVinci/-/blob/master/DaVinciExamples/python/DaVinciExamples/tupling/option_davinci_configFuntuple.py). There are many examples floating around out there, the tutorials are very out of date on the subject of run 3, and there are lots of defunct naming conventions too. The example I used is working at the time of writing this, and my own DaVinci script is named 
+option_davinci_tupling_from_hlt2.py. To run the code, I used the command
+```
+DaVinci/run davinci run-mc --inputfiledb Hlt2Output DV_scripts/data.yaml --joboptfile DV_scripts/option_davinci_hlt2.yaml --user_algorithms DV_scripts/option_davinci_tupling_from_hlt2:main
+```
+`data.yaml` specifies the inputs, `option_davinci_tupling_from_hlt2` is the python file I just described, and `option_davinci_hlt2.yaml` gives some output and other options. An example lives in this directory as well as the one mentioned earlier which I used to write my own.
 
-I have a modified version of Moore and Rec that I need to use when submitting jobs to Ganga. For this, I use 
+Notably, at the time of writing this document you could not put any functor which uses the distance calculator as a variable in the ntuples, according to [this](https://mattermost.web.cern.ch/lhcb/pl/opuwpjo9qid3j8nx1qn8ts9ewe) discussion. This is being fixed as I write. 
 
+# Moore and Ganga
+
+I have a modified version of Moore and Rec that I need to use when submitting jobs to Ganga. For this, you must create the nightly build of Moore following instructions [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/ganga.html#build). Mine requires a modified version of Rec as well, so inside the build of Moore, I used the commands
+
+```
+git lb-use Rec
+git lb-checkout Rec/Master Phys
+```
+For more information about the `lb-dev` environment, you can look [here](https://lhcb-core-doc.web.cern.ch/lhcb-core-doc/GitForLHCbUsers.html#using-git-for-lhcb-development). The higher level project should be built using the nightly, and any dependencies can be used and checked out inside that directory. From the nightly directory, you can change whatever you need and submit a job in Moore to ganga. [These instructions](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/ganga.html) describe how to write the script for Ganga, and [this](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/davinci-grid.html) provides more information on writing the script and setting up the job. Overall, the starterkit has some documentation on Ganga. In this directory I have `MC_job.py` and `minbias_job.py` which provide examples of how to write Ganga scripts for Moore jobs. 
+
+The file you need to specify inputs is the one you download by following the instructions from bookkeeping [here](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/bookkeeping.html).
+
+You need both the output LDST file as well as JSON file created along with the LDST in order to run DaVinci, instructions for how to produce this JSON file are [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/hlt2_analysis.html).
+
+Do not try to use `lb-...` commands for pushing to a branch. They are defunct. For development use `git` commands from the project you are developing (for example, from `Rec` if I am doing functor development). The only purpose of these `lb-dev` environments as far as I can tell is to provide a copy of your code to Ganga so it can run a job on your version of Moore. 
