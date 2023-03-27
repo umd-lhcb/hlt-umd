@@ -1,27 +1,41 @@
 # Moore configuration
 from Moore import options, run_moore
-
-from Hlt2Conf.lines.b_to_kpi import BToKpi0_line
-
-
-# In a normal options file, we would import the line from Hlt2Conf where it is
-# defined
-# from Hlt2Conf.lines.LbToLcPi import lbtolcpi_lctopkpi_line
+# from Moore.tcks import dump_hlt2_configuration
+from Hlt2Conf.lines.bnoc.hlt2_bnoc import Bds_KSPi_LL_line, BuPiPi_line
 
 # Temporary workaround for TrackStateProvider
 from RecoConf.global_tools import stateProvider_with_simplified_geom
 from RecoConf.reconstruction_objects import upfront_reconstruction, reconstruction
 
-public_tools = [stateProvider_with_simplified_geom()]
+from Gaudi.Configuration import FileCatalog, ApplicationMgr
+from GaudiConf import IOHelper
 
-options.set_input_and_conds_from_testfiledb('Upgrade_MinBias_LDST')
+# catalog = FileCatalog().Catalogs = [ 'xmlcatalog_file:/afs/cern.ch/user/e/ejiang/my_work/public/stack/MC/catalogs/minbiasCatalog.xml' ]
+# ApplicationMgr().ExtSvc.append(catalog)
+# input_files = []
+
+#options.evt_max = 1000
+options.simulation = True
+
+#options.input_files = input_files
+options.input_type = 'ROOT'
+#options.set_input_and_conds_from_testfiledb('Upgrade_MinBias_LDST')
 options.input_raw_format = 4.3
-#options.evt_max = 100
-#options.control_flow_file = 'control_flow.gv'
-#options.data_flow_file = 'data_flow.gv'
+options.data_type = 'Upgrade'
+options.dddb_tag = 'dddb-20171126'
+options.conddb_tag = 'sim-20171127-vc-md100'
+options.geometry_version = 'trunk'
+options.conditions_version = 'master'
+
+options.output_file = 'test_b_to_kpi_minbias_tck.LDST'
+options.output_type = 'ROOT'
 
 def all_lines():
-    return [BToKpi0_line()]
+    return [Bds_KSPi_LL_line(), BuPiPi_line()]
     
-run_moore(options, all_lines, public_tools)
-    
+public_tools = [stateProvider_with_simplified_geom()]
+#run_moore(options, all_lines, public_tools)
+
+config = run_moore(options, all_lines, public_tools)
+#dump_hlt2_configuration(config, "my_test_b_to_kpi_minbias.tck.json")
+options.output_manifest_file = "my_test_b_to_kpi_minbias.tck.json"    
