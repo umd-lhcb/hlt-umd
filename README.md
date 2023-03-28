@@ -5,7 +5,7 @@ To build Moore, follow the steps [here](https://gitlab.cern.ch/rmatev/lb-stack-s
 ```
 git merge origin master
 ```
-Best practice would be to develop with a local copy of the master branch.
+Best practice would be to develop with a local copy of the master branch. New code should now be pushed to `master`, whereas before it was pushed to `bnoc_run3`.
 
 # Writing the HLT2 Line
 
@@ -18,7 +18,7 @@ and should be booked in
 ```
 Hlt/Hlt2Conf/python/Hlt2Conf/lines/bnoc/hlt2_bnoc.py
 ```
-Note this is not necessary to run the code, it only books it with @register_line. You will notice when writing the line that the dependencies are very different. What I did was I followed the [tutorial](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/hlt2_line.html#) to write an Hlt2 line and modified it based on the run 2 line. There is a B2OC which is fully implemented with ThOr functors [here](https://gitlab.cern.ch/lhcb/Moore/-/tree/master/Hlt/Hlt2Conf/python/Hlt2Conf/lines/b_to_open_charm_thor) which is helpful as an example. 
+Note this is not necessary to run the code, it only books it with `@register_line`. You will notice when writing the line that the dependencies are very different. What I did was I followed the [tutorial](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/hlt2_line.html#) to write an Hlt2 line and modified it based on the run 2 line. There is a B2OC which is fully implemented with ThOr functors [here](https://gitlab.cern.ch/lhcb/Moore/-/tree/master/Hlt/Hlt2Conf/python/Hlt2Conf/lines/b_to_open_charm_thor) which is helpful as an example. 
 
 One obvious difference is that we need ThOr functors instead of LoKi, this conversion is described [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/thor_transition.html) and the comprehensive list of ThOr functors is [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/selection/thor_functors_reference.html). If any ThOr functors are missing, you can open an issue [here](https://gitlab.cern.ch/lhcb-dpa/project/-/issues/61). 
 
@@ -42,12 +42,23 @@ Hlt/Hlt2Conf/options
 ```
 Then, follow this [tutorial](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/hlt2_line.html#running) which will tell you how to write an options file that runs over the minimum bias input. 
 
-To run over MC files, find the file you want in bookkeeping by following [this tutorial](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/bookkeeping.html). Using the path to that file, create an array in your options file which contains the paths to the files you want. The path should be 
+To run over MC files, find the file you want in bookkeeping by following [this tutorial](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/bookkeeping.html), and downloading it as a python file. Using the path to that file, create an array in your options file which contains the paths to the files you want. The path should be 
 ```
 root://eoslhcb.cern.ch//eos/lhcb/grid/prod/INSERT PATH YOU COPIED FROM BOOKKEEPING HERE
 ```
 You may encounter MC files of different formats, [this tutorial](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/different_samples.html) will show you how to handle them--but it won't tell you everything! Also, some of the example options files it gives are inconsistent with what the tutorial says--for example options.input_raw_format is set in the tutorial but not in the example. I used the tutorial setting. It is also missing some things. You need to include two options not mentioned in the tutorial which are ```options.dddb_tag``` and ```options.conddb_tag```. The settings for these are specific to each decay, you can find them by following the instructions [here](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/minimal-dv-job.html) under the heading "Database tags". Errors related to the decoding version can be handled following the instructions [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/different_samples.html#ft-decoding-version).
 
+Most recently (at time of writing) it appears that LFNs are not accepted as input files, and they must be converted to PFNs. To convert to PFN, use
+
+```
+lb-dirac dirac-bookkeeping-genXMLCatalog --Options=LFN_from_bookkeeping.py --NewOptions=PFN.py
+```
+To run locally, use the command
+
+```
+./Moore/run gaudirun.py /path/to/options.py /path/to/PFN.py
+```
+ 
 # Options File
 
 To run over more than one file, there are a few options. At first I was running over files in eos, but I realized not all the MC files were in there. Then, I looked into using a catalog instead, follwing [these](https://lhcb.github.io/starterkit-lessons/first-analysis-steps/files-from-grid.html) instructions under the "read files remotely..." heading. An example of using inputs from eos is [here](https://github.com/umd-lhcb/hlt-umd/blob/139e95f6c6d74769452e5a81d88a84fc5feaf269/test_b_to_kpi_xdigi.py).
@@ -78,3 +89,10 @@ The file you need to specify inputs is the one you download by following the ins
 You need both the output LDST file as well as JSON file created along with the LDST in order to run DaVinci, instructions for how to produce this JSON file are [here](https://lhcbdoc.web.cern.ch/lhcbdoc/moore/master/tutorials/hlt2_analysis.html).
 
 Do not try to use `lb-...` commands for pushing to a branch. They are defunct. For development use `git` commands from the project you are developing (for example, from `Rec` if I am doing functor development). The only purpose of these `lb-dev` environments as far as I can tell is to provide a copy of your code to Ganga so it can run a job on your version of Moore. 
+
+As of today (3/28/23) the working Ganga script is titled `minbias_job.py`, and the compatible options file is titled `test_b_to_kpi.py`. To run the job all you need to do is 
+
+```
+lhcb-proxy-init
+ganga minbias_job.py
+```
